@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>One Tiny Puzzle 💌</title>
+  <style>
+    :root { --bg:#0b1020; --card:#121a33; --text:#eaf0ff; --muted:#aab6e6; --accent:#ff5fa2; --good:#43f39a; --bad:#ff6b6b; }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(255,95,162,.20), transparent 60%),
+                  radial-gradient(900px 500px at 80% 30%, rgba(67,243,154,.16), transparent 60%),
+                  var(--bg);
+      color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:18px;
+    }
+    .wrap{width:min(720px,100%)}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+    }
+    h1{margin:0 0 8px; font-size:22px; letter-spacing:.2px}
+    p{margin:10px 0; color:var(--muted); line-height:1.45}
+    .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+    input{
+      flex:1; min-width:220px;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      outline: none;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    button:hover{background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22)}
+    button:active{transform: translateY(1px)}
+    .accent{background: rgba(255,95,162,.20); border-color: rgba(255,95,162,.35)}
+    .accent:hover{background: rgba(255,95,162,.28)}
+    .good{color:var(--good)}
+    .bad{color:var(--bad)}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .hidden{display:none}
+    .divider{height:1px; background: rgba(255,255,255,.10); margin:16px 0}
+    .big{
+      font-size: 28px; margin: 8px 0 6px;
+    }
+    .choices{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+    .choices button{flex:1; min-width:220px}
+    .tiny{font-size:12px; opacity:.9}
+    .codeBox{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background: rgba(0,0,0,.20);
+      color: var(--text);
+      margin-top: 10px;
+      overflow:auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="pill" id="progressPill">Step <span id="stepNum">1</span> of 3</div>
+      <h1 id="title">A tiny puzzle for you 💌</h1>
+      <p id="subtitle">Solve this and you’ll unlock something I’ve been wanting to ask.</p>
+
+      <!-- STEP 1 -->
+      <div id="step1">
+        <div class="divider"></div>
+        <p><b>Riddle:</b> Airport where I first proposed to you.</p>
+        <p class="tiny">Hint: 3 letters 🙂</p>
+        <div class="row">
+          <input id="answer1" placeholder="type your answer…" autocomplete="off" />
+          <button class="accent" onclick="checkStep1()">Submit</button>
+        </div>
+        <p id="msg1" class="tiny"></p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step2" class="hidden">
+        <div class="divider"></div>
+        <p><b>Of course you got that.</b> Now decode this message. It’s a Caesar shift.</p>
+        <p class="tiny">Hint: Shift <b>back</b> by <b>3</b>. (So D→A, E→B, F→C…)</p>
+
+        <div class="codeBox" id="cipherText"></div>
+
+        <p class="tiny">Enter the decoded word (one word):</p>
+        <div class="row">
+          <input id="answer2" placeholder="decoded word…" autocomplete="off" />
+          <button class="accent" onclick="checkStep2()">Unlock</button>
+        </div>
+        <p id="msg2" class="tiny"></p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="step3" class="hidden">
+        <div class="divider"></div>
+        <div class="big">Okay… here it is 🥺</div>
+        <p>Will you be my Valentine?</p>
+
+        <div class="choices">
+          <button class="accent" onclick="finalYes('YES 💘 (obviously)')">YES 💘</button>
+          <button class="accent" onclick="finalYes('YES 🥰 (but blushing)')">YES 🥰</button>
+        </div>
+
+        <p id="finalMsg" class="good" style="margin-top:16px;"></p>
+        <p class="tiny" id="finalTiny"></p>
+      </div>
+
+      <div class="divider"></div>
+      <p class="tiny">
+        <span class="pill">Tip</span>
+        Upload as <b>index.html</b> to GitHub Pages / Netlify and send her the link.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // PERSONALIZED
+    // =========================
+    const HER_NAME = "Aditi";
+    const SIGN_OFF = "— Abhigya ❤️";
+
+    // Step 1 acceptable answers
+    // Accepting a few variants just in case she types caps or adds spacing
+    const STEP1_ACCEPT = ["cph", "copenhagen", "copenhagen airport", "kastrup", "copenhagen kastrup"];
+
+    // Step 2 secret word (decoded)
+    const STEP2_SECRET = "VALENTINE";
+
+    function caesarShift(str, shift) {
+      return str.replace(/[A-Z]/g, c => {
+        const base = "A".charCodeAt(0);
+        const code = c.charCodeAt(0) - base;
+        return String.fromCharCode(base + (code + shift + 26) % 26);
+      });
+    }
+
+    // Set cipher text on load
+    document.getElementById("cipherText").textContent = caesarShift(STEP2_SECRET, 3);
+
+    // Personalize title
+    document.getElementById("title").textContent = `A tiny puzzle for you, ${HER_NAME} 💌`;
+
+    function normalize(s) {
+      return (s || "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function setStep(n) {
+      document.getElementById("stepNum").textContent = String(n);
+    }
+
+    function checkStep1() {
+      const a = normalize(document.getElementById("answer1").value);
+      const msg = document.getElementById("msg1");
+      if (STEP1_ACCEPT.includes(a)) {
+        msg.innerHTML = `<span class="good">Correct.</span> That memory is permanently pinned in my head.`;
+        goToStep2();
+      } else {
+        msg.innerHTML = `<span class="bad">Not quite.</span> Think: 3-letter airport code 😉`;
+      }
+    }
+
+    function goToStep2() {
+      document.getElementById("step1").classList.add("hidden");
+      document.getElementById("step2").classList.remove("hidden");
+      setStep(2);
+      setTimeout(() => document.getElementById("answer2").focus(), 100);
+    }
+
+    function checkStep2() {
+      const a = normalize(document.getElementById("answer2").value).toUpperCase();
+      const msg = document.getElementById("msg2");
+      if (a === STEP2_SECRET) {
+        msg.innerHTML = `<span class="good">Unlocked.</span> One last thing…`;
+        goToStep3();
+      } else {
+        msg.innerHTML = `<span class="bad">Not yet.</span> Shift each letter back by 3 (D→A).`;
+      }
+    }
+
+    function goToStep3() {
+      document.getElementById("step2").classList.add("hidden");
+      document.getElementById("step3").classList.remove("hidden");
+      setStep(3);
+    }
+
+    function finalYes(which) {
+      document.getElementById("finalMsg").textContent = `You chose: ${which}`;
+      document.getElementById("finalTiny").textContent = `Happy Propose Day. ${SIGN_OFF}`;
+      burst();
+    }
+
+    // Tiny confetti burst (no libs)
+    function burst() {
+      const n = 70;
+      for (let i = 0; i < n; i++) {
+        const d = document.createElement("div");
+        d.style.position = "fixed";
+        d.style.left = (Math.random() * 100) + "vw";
+        d.style.top = "-10px";
+        d.style.width = "8px";
+        d.style.height = "12px";
+        d.style.background = `hsl(${Math.random()*360}, 85%, 65%)`;
+        d.style.borderRadius = "3px";
+        d.style.opacity = "0.95";
+        d.style.transform = `rotate(${Math.random()*360}deg)`;
+        d.style.zIndex = 9999;
+        d.style.pointerEvents = "none";
+        document.body.appendChild(d);
+
+        const fall = 900 + Math.random()*1200;
+        const drift = (Math.random() - 0.5) * 200;
+
+        d.animate([
+          { transform: d.style.transform, top: "-10px", offset: 0 },
+          { transform: `translateX(${drift}px) rotate(${Math.random()*720}deg)`, top: "110vh", offset: 1 }
+        ], { duration: fall, easing: "cubic-bezier(.2,.7,.2,1)" });
+
+        setTimeout(() => d.remove(), fall + 50);
+      }
+    }
+  </script>
+</body>
+</html>
